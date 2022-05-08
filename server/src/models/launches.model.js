@@ -1,5 +1,7 @@
 const launches = new Map();
 
+let latestFlightNumber = 100;
+
 const launch = {
     flightNumber : 100,
     mission : 'Keepler Exploration X',
@@ -16,7 +18,19 @@ launches.set(launch.flightNumber, launch);
 const getAllLaunches = ()=>{
     return Array.from(launches.values());
 }
+
+const addNewLaunch = (launch) => {
+    latestFlightNumber++;
+    launches.set(latestFlightNumber,Object.assign(launch,{
+        success:true,
+        upcoming:true,
+        customers: ['Zero to Mastery','Nasa'],
+        flightNumber:latestFlightNumber
+    }))
+}
+
 module.exports = {
     launches,
-    getAllLaunches
+    getAllLaunches,
+    addNewLaunch
 }
