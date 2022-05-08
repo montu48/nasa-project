@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const { parse } = require("csv-parse");
-const { httpGetAllPlanets } = require("../routes/planets/planets.controller");
 
 
 let habitabalPlanets = [];

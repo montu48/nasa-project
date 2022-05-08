@@ -10,6 +10,7 @@
     "server": "npm run watch --prefix server",
     "client": "npm start --prefix client",
     "watch": "concurrently \"npm run server\" \"npm run client\"",
+    "deploy": "npm run build --prefix client && npm start --prefix server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,5 +25,8 @@
   "homepage": "https://github.com/montu48/nasa-project#readme",
   "dependencies": {
     "concurrently": "^7.1.0"
+  },
+  "devDependencies": {
+    "jest": "^28.1.0"
   }
 }
