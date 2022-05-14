@@ -1,15 +1,16 @@
 const fs = require("fs");
 const path = require("path");
 const { parse } = require("csv-parse");
+const planets = require('./planets.mongoose');
 
 
-let habitabalPlanets = [];
+
 
 function isHabitablePlanet(planet) {
     return planet['koi_disposition'] === 'CONFIRMED'
-      && planet['koi_insol'] > 0.36 && planet['koi_insol'] < 1.11
-      && planet['koi_prad'] < 1.6;
-  }
+        && planet['koi_insol'] > 0.36 && planet['koi_insol'] < 1.11
+        && planet['koi_prad'] < 1.6;
+}
 
 function loadPlanetsData() {
     return new Promise((resolve, reject) => {
@@ -20,23 +21,39 @@ function loadPlanetsData() {
                     columns: true,
                 })
             )
-            .on("data", async  (data) => {
+            .on("data", async (data) => {
                 if (isHabitablePlanet(data)) {
-                    habitabalPlanets.push(data);
+                    await savePlanet(data)
                 }
             })
             .on("error", (err) => {
                 console.log(err);
                 reject(err);
             })
-            .on("end", () => {
+            .on("end", async() => {
+                const countPlanetsFound = (await getAllPlanets()).length;
                 resolve()
             });
     });
 }
 
-const getAllPlanets = () => {
-    return habitabalPlanets;
+const getAllPlanets = async () => {
+    return await planets.find({});
+}
+
+const savePlanet = async (planet) => {
+    try {
+        await planets.updateOne({
+            keplerName: planet.kepler_name
+        }, {
+            keplerName: planet.kepler_name
+        }, {
+            upsert: true,
+        });
+    } catch (error) {
+        console.log(error)
+    }
+   
 }
 
 module.exports = {
