@@ -12,10 +12,11 @@
   },
   "author": "Meet Shah",
   "license": "ISC",
-  "jest":{
-    "testEnvironment":"node"
+  "jest": {
+    "testEnvironment": "node"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "cors": "^2.8.5",
     "csv-parse": "^5.0.4",
     "dotenv": "^16.0.1",
