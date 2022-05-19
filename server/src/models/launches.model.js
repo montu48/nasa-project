@@ -2,7 +2,6 @@ const axios = require('axios');
 const launchesDatabase = require('./launches.mongo');
 const planets = require('./planets.mongoose');
 
-const launches = new Map();
 const DEFAULT_FLIGHT_NUMBER = 100;
 
 const launch = {
@@ -37,10 +36,11 @@ const saveLaunch = async (launch) => {
 const SPACEX_API_URL = 'https://api.spacexdata.com/v4/launches/query';
 saveLaunch(launch);
 
-const loadLaunchesData = async () => {
-    const response = await axios.post(SPACEX_API_URL, {
+const populateLaunches = async()=>{
+  const response = await axios.post(SPACEX_API_URL, {
         query: {},
         options: {
+            pagination:false,
             populate: [
                 {
                     path: 'rocket',
@@ -77,12 +77,30 @@ const loadLaunchesData = async () => {
 
         console.log(launch)
     }
+}
+
+const loadLaunchesData = async () => {
+  const firstLauch = await findLaunch({
+    flightNumber: 1,
+    rocket: 'Falcon 1',
+    mission:'FalconSat',
+  });
+  if(firstLauch){
+    console.log('Launch Data already exist');
+  }else{
+    await populateLaunches()
+  }
+    
 
 }
 
+const findLaunch = async(filter)=>{
+  return await launchesDatabase.findOne(filter);
+}
+
 const existLaunchWithId = async (launchId) => {
-    return await launchesDatabase.findOne({
-        flightNumber: launchId
+    return await findLaunch({
+      flightNumber: launchId,
     })
 }
 
