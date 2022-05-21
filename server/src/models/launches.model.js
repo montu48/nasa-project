@@ -16,12 +16,6 @@ const launch = {
 }
 
 const saveLaunch = async (launch) => {
-    const planet = await planets.findOne({
-        keplerName: launch.target,
-    });
-    if (!planet) {
-        throw new Error('No matching planet found');
-    }
     await launchesDatabase.findOneAndUpdate(
         {
             flightNumber: launch.flightNumber,
@@ -34,7 +28,7 @@ const saveLaunch = async (launch) => {
 };
 
 const SPACEX_API_URL = 'https://api.spacexdata.com/v4/launches/query';
-saveLaunch(launch);
+
 
 const populateLaunches = async()=>{
   const response = await axios.post(SPACEX_API_URL, {
@@ -57,6 +51,11 @@ const populateLaunches = async()=>{
             ]
         }
     });
+    console.log(response)
+    if(response.data.status != 200){
+        console.log("Error Downloading Data")
+        throw new Error("Error Downloading Data")
+    }
 
     const launchData = response.data.docs;
     for (const launchDoc of launchData) {
@@ -73,9 +72,9 @@ const populateLaunches = async()=>{
             upcoming: launchDoc['upcoming'],
             success: launchDoc['success'],
             customers,
-        }
+        };
 
-        console.log(launch)
+        await saveLaunch(launch);
     }
 }
 
@@ -116,13 +115,19 @@ const getLatestFlightNumber = async () => {
     return latestLaunch.flightNumber;
 }
 
-const getAllLaunches = async () => {
+const getAllLaunches = async (skip,limit) => {
     return await launchesDatabase.find({}, {
         '_id': 0, '__v': 0
-    })
+    }).skip(skip).limit(limit)
 }
 
-const scheduleNewLaunch = async () => {
+const scheduleNewLaunch = async (launch) => {
+    const planet = await planets.findOne({
+        keplerName: launch.target,
+    });
+    if (!planet) {
+        throw new Error('No matching planet found');
+    }
     const newFlightNumber = await getLatestFlightNumber() + 1;
     const newLaunch = Object.assign(launch, {
         success: true,
