@@ -4,17 +4,6 @@ const planets = require('./planets.mongoose');
 
 const DEFAULT_FLIGHT_NUMBER = 100;
 
-const launch = {
-    flightNumber: 100,
-    mission: 'Keepler Exploration X',
-    rocket: 'Exploration IS1',
-    launchDate: new Date('March 28, 2022'),
-    target: 'Kepler-442 b',
-    customers: ['ZTM', 'NASA'],
-    upcoming: true,
-    success: true,
-}
-
 const saveLaunch = async (launch) => {
     await launchesDatabase.findOneAndUpdate(
         {
@@ -51,7 +40,6 @@ const populateLaunches = async()=>{
             ]
         }
     });
-    console.log(response)
     if(response.data.status != 200){
         console.log("Error Downloading Data")
         throw new Error("Error Downloading Data")
@@ -118,7 +106,7 @@ const getLatestFlightNumber = async () => {
 const getAllLaunches = async (skip,limit) => {
     return await launchesDatabase.find({}, {
         '_id': 0, '__v': 0
-    }).skip(skip).limit(limit)
+    }).sort({flightNumber:1}).skip(skip).limit(limit)
 }
 
 const scheduleNewLaunch = async (launch) => {
